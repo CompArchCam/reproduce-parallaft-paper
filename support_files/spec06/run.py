@@ -32,7 +32,9 @@ import signal
 
 
 class SPECRunResult(NamedTuple):
-    result_path: Optional[Path]
+    result_paths: List[Path]
+    stdout: str
+    stderr: str
 
 
 def run_spec(
@@ -75,13 +77,15 @@ def run_spec(
         preexec_fn=lambda: prctl.set_pdeathsig(signal.SIGKILL),  # type: ignore
     )
 
-    result_path_match = re.search(
+    result_path_matches = re.finditer(
         r"^ *format: raw -> (.+)$", output.stdout, re.MULTILINE
     )
 
-    result_path = Path(result_path_match.groups()[0]) if result_path_match else None  # type: ignore
+    result_paths = [Path(m.groups()[0]) for m in result_path_matches]
 
-    return SPECRunResult(result_path=result_path)
+    return SPECRunResult(
+        result_paths=result_paths, stdout=output.stdout, stderr=output.stderr
+    )
 
 
 def get_parallaft_ver():
@@ -449,10 +453,14 @@ def run_experiment(
     run_result_dir = run_dir / "result"
     run_result_dir.mkdir(parents=True, exist_ok=True)
 
-    if result.result_path:
-        (run_result_dir / result.result_path.name).symlink_to(result.result_path)
+    for p in result.result_paths:
+        (run_result_dir / p.name).symlink_to(p)
 
-    print(f"SPEC result written to: {result.result_path}")
+    run_log_dir = run_dir / "log"
+    (run_log_dir / "spec_stdout.log").write_text(result.stdout)
+    (run_log_dir / "spec_stderr.log").write_text(result.stderr)
+
+    print(f"SPEC result written to: {result.result_paths}")
 
 
 def run_experiment_repeated(
@@ -502,8 +510,10 @@ def main():
 
     argparser.add_argument("benchmarks", nargs="+")
     argparser.add_argument("--name", type=str)
-    argparser.add_argument("--spec-dir", type=Path, default=Path(".."))
-    argparser.add_argument("--releval-dir", type=Path, default=Path("."))
+    argparser.add_argument(
+        "--spec-dir", type=Path, default=Path(__file__).parent.parent
+    )
+    argparser.add_argument("--releval-dir", type=Path, default=Path(__file__).parent)
     argparser.add_argument("--dry-run", action="store_true")
     argparser.add_argument("--repeat", type=int, default=1)
     argparser.add_argument("--overwrite", action="store_true")

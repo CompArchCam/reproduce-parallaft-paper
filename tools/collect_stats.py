@@ -18,6 +18,7 @@ from copy import deepcopy
 from glob import glob
 import argparse
 import sys
+import numpy as np
 
 Benchmark = namedtuple(
     "Benchmark", ["suite", "int_or_fp", "name", "filename", "sub_run_hashes"]
@@ -327,11 +328,9 @@ CROSS_EXP_DERIVED_FIELD_LIST = [
     ),
 ]
 
-CROSS_EXP_DERIVED_FIELD_LIST_DICT = { f.name: f for f in CROSS_EXP_DERIVED_FIELD_LIST }
+CROSS_EXP_DERIVED_FIELD_LIST_DICT = {f.name: f for f in CROSS_EXP_DERIVED_FIELD_LIST}
 
-ALL_FIELD_DICT = {
-    f.name: f for f in FIELD_LIST + DERIVED_FIELD_LIST
-}
+ALL_FIELD_DICT = {f.name: f for f in FIELD_LIST + DERIVED_FIELD_LIST}
 
 
 def parse_stats_file(filename: str) -> Dict[str, Any]:
@@ -412,13 +411,13 @@ FIELD_GROUPS = {
         (ExperimentType.CROSS_EXP_DERIVED, f_raft_overhead_energy),
     ],
     "parallaft_performance_overhead_breakdown": [
-        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_runtime_work),
-        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_last_checker_sync),
+        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_fork_and_cow),
         (
             ExperimentType.CROSS_EXP_DERIVED,
             f_parallaft_overhead_perf_resource_contention,
         ),
-        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_fork_and_cow),
+        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_last_checker_sync),
+        (ExperimentType.CROSS_EXP_DERIVED, f_parallaft_overhead_perf_runtime_work),
     ],
 }
 
@@ -431,6 +430,8 @@ def main():
     parser.add_argument("--no-bench-number", action="store_true")
     parser.add_argument("--sep", default=",")
     parser.add_argument("--output")
+    parser.add_argument("--scale", default=1.0, type=float)
+    parser.add_argument("--geomean", action="store_true")
 
     for ty in EXPERIMENT_TYPE_LIST:
         parser.add_argument(f"--{ty.value}")
@@ -443,7 +444,9 @@ def main():
         if f in FIELD_GROUPS:
             fields.extend(FIELD_GROUPS[f])
         elif f in CROSS_EXP_DERIVED_FIELD_LIST_DICT:
-            fields.append((ExperimentType.CROSS_EXP_DERIVED, CROSS_EXP_DERIVED_FIELD_LIST_DICT[f]))
+            fields.append(
+                (ExperimentType.CROSS_EXP_DERIVED, CROSS_EXP_DERIVED_FIELD_LIST_DICT[f])
+            )
         else:
             try:
                 exp_type, field_name = f.split(":", 2)
@@ -459,8 +462,6 @@ def main():
                 raise ValueError(f"Unknown field: {field_name}")
 
     out = []
-    if not args.no_header:
-        out.append(["name"] + list(map(lambda f: f[0].value + ":" + f[1].name, fields)))
 
     experiment_dirs = {}
     for ty in EXPERIMENT_TYPE_LIST:
@@ -502,19 +503,38 @@ def main():
         else:
             benchmark_name = benchmark.name
 
-        out.append([benchmark_name] + [exp_stats.get((e, f.name)) for e, f in fields])
+        out.append(
+            [benchmark_name]
+            + [exp_stats.get((e, f.name), float("nan")) for e, f in fields]
+        )
+
+    if args.geomean:
+        a = np.array(list(zip(*out))[1:], dtype=float) + 1.0
+        geomean = a.prod(axis=1) ** (1 / a.shape[1]) - 1.0
+        out.append(
+            [
+                "Geomean",
+                *geomean,
+            ]
+        )
 
     out_buf = ""
+
+    if not args.no_header:
+        out_buf += args.sep.join(
+            ["name"] + list(map(lambda f: f[0].value + ":" + f[1].name, fields))
+        )
+
     for line in out:
         if args.no_names:
             line = line[1:]
 
-        def stringify(x):
+        def stringify_and_scale(x):
             if isinstance(x, float):
-                return "{:.4f}".format(x)
+                return "{:.4f}".format(x * args.scale)
             return str(x)
 
-        out_buf += args.sep.join(map(stringify, line)) + "\n"
+        out_buf += args.sep.join(map(stringify_and_scale, line)) + "\n"
 
     if args.output:
         with open(args.output, "wt") as f:

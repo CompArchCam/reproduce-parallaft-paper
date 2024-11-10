@@ -19,15 +19,14 @@ pushd "$SPEC_DIR"
 tar xvf "$SPEC_MNT"/install_archives/cpu2006.tar.xz
 
 # Install cactusADM src.alts 
-wget https://www.spec.org/cpu2006/src.alt/436.cactusADM.sprintf.cpu2006.v1.2.tar.xz -O 436.cactusADM.sprintf.cpu2006.v1.2.tar.xz
-tar xvf 436.cactusADM.sprintf.cpu2006.v1.2.tar.xz
+
+curl -sSL https://www.spec.org/cpu2006/src.alt/436.cactusADM.sprintf.cpu2006.v1.2.tar.xz | tar Jxvf -
 
 SPEC_INSTALL_ARGS=(-f)
 
 if [ `uname -m` = "aarch64" ]; then
     # Install SPEC build tools for arm64 
-    wget https://www.spec.org/cpu2006/src.alt/linux-apm-arm64-118.tar -O linux-apm-arm64-118.tar
-    tar xvf linux-apm-arm64-118.tar
+    curl -sSL https://www.spec.org/cpu2006/src.alt/linux-apm-arm64-118.tar | tar xvf -
 
     SPEC_INSTALL_ARGS+=(-u linux-apm-arm64)
 fi
