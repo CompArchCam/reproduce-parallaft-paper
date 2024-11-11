@@ -25,51 +25,25 @@ Benchmark = namedtuple(
 )
 
 BENCHMARKS = [
-    Benchmark(
-        "2006", "int", "400.perlbench", "perlbench_base", ["306b23", "53063c", "56f39e"]
-    ),
-    Benchmark(
-        "2006",
-        "int",
-        "401.bzip2",
-        "bzip2_base",
-        ["3dfb44", "47607a", "5ff518", "8f5aa6", "c5113e", "cccaf4"],
-    ),
-    Benchmark(
-        "2006",
-        "int",
-        "403.gcc",
-        "gcc_base",
-        [
-            "1bdfa0",
-            "278dd0",
-            "2a05b3",
-            "35e1c1",
-            "3f387c",
-            "9587d2",
-            "adcb6e",
-            "e6e141",
-            "f65744",
-        ],
-    ),
+    Benchmark("2006", "int", "400.perlbench", "perlbench_base", ["306b23", "53063c", "56f39e"]),
+    Benchmark("2006", "int", "401.bzip2", "bzip2_base", ["3dfb44", "47607a", "5ff518", "8f5aa6", "c5113e", "cccaf4"]),
+    Benchmark("2006", "int", "403.gcc", "gcc_base", ["1bdfa0", "278dd0", "2a05b3", "35e1c1", "3f387c", "9587d2", "adcb6e", "e6e141", "f65744"]),
     Benchmark("2006", "int", "429.mcf", "mcf_base", ["4fb2fd"]),
-    Benchmark("2006", "int", "445.gobmk", "gobmk_base", ["2dfe15"]),
+    Benchmark("2006", "int", "445.gobmk", "gobmk_base", ["2b07a7", "5dc95e", "cdeac7", "def92d", "e4d00b"]),
     Benchmark("2006", "int", "456.hmmer", "hmmer_base", ["ced74f", "df0e1a"]),
     Benchmark("2006", "int", "458.sjeng", "sjeng_base", ["efbd59"]),
     Benchmark("2006", "int", "462.libquantum", "libquantum_base", ["654b4d"]),
-    Benchmark(
-        "2006", "int", "464.h264ref", "h264ref_base", ["1aafff", "bb8834", "bcba84"]
-    ),
+    Benchmark("2006", "int", "464.h264ref", "h264ref_base", ["1aafff", "bb8834", "bcba84"]),
     Benchmark("2006", "int", "471.omnetpp", "omnetpp_base", ["ca5180"]),
     Benchmark("2006", "int", "473.astar", "astar_base", ["4a80b8", "ebff19"]),
     Benchmark("2006", "int", "483.xalancbmk", "Xalan_base", ["432258"]),
     Benchmark("2006", "fp", "410.bwaves", "bwaves_base", ["ee089e"]),
-    Benchmark("2006", "fp", "416.gamess", "gamess_base", ["efbb5f"]),
-    Benchmark("2006", "fp", "433.milc", "milc_base", ["6d12ab"]),
+    Benchmark("2006", "fp", "416.gamess", "gamess_base", ["1ca871", "6bb65b", "94239b"]),
+    Benchmark("2006", "fp", "433.milc", "milc_base", ["508240"]),
     Benchmark("2006", "fp", "434.zeusmp", "zeusmp_base", ["9e6de0"]),
     Benchmark("2006", "fp", "435.gromacs", "gromacs_base", ["a2d10f"]),
     Benchmark("2006", "fp", "436.cactusADM", "cactusADM_base", ["3b331e"]),
-    Benchmark("2006", "fp", "437.leslie3d", "leslie3d_base", ["175d50"]),
+    Benchmark("2006", "fp", "437.leslie3d", "leslie3d_base", ["4641ab"]),
     Benchmark("2006", "fp", "444.namd", "namd_base", ["43248b"]),
     Benchmark("2006", "fp", "447.dealII", "dealII_base", ["c2a7d3"]),
     Benchmark("2006", "fp", "450.soplex", "soplex_base", ["a6be97", "c2a843"]),
@@ -80,6 +54,7 @@ BENCHMARKS = [
     Benchmark("2006", "fp", "470.lbm", "lbm_base", ["e5f68a"]),
     Benchmark("2006", "fp", "481.wrf", "wrf_base", ["70336d"]),
     Benchmark("2006", "fp", "482.sphinx3", "sphinx_livepretend_base", ["3ab418"]),
+    Benchmark("2006", "fp", "specrand", "specrand_base", ["ecdcbc"]),
 ]
 
 T = TypeVar("T")

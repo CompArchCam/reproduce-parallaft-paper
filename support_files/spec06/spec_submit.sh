@@ -212,9 +212,20 @@ mkdir -p "$EXP_DIR"
 mkdir -p "$RESULT_DIR"
 mkdir -p "$LOG_DIR"
 
-RUN_HASH=$(normalize_cmdline "$@" | md5sum | head -c 6)
+RUN_ID=`normalize_cmdline "$@"`
+STDIN_FILE=`readlink -f /proc/self/fd/0 || true`
+
+# check if stdin exists and does not point to anywhere under /dev
+if [[ -n "$STDIN_FILE" && "$STDIN_FILE" != /dev/* ]]; then
+  STDIN_FILE=`basename $STDIN_FILE`
+  RUN_ID="$RUN_ID < $STDIN_FILE"
+fi
+
+RUN_HASH=`echo -n "$RUN_ID" | md5sum | head -c 6`
 LOG_PREFIX="$LOG_DIR/$RUN_HASH-$(basename $1)"
 RESULT_PREFIX="$RESULT_DIR/$RUN_HASH-$(basename $1)"
+
+echo "$RUN_ID" > "$LOG_PREFIX.run_id.txt"
 
 if [ -n "$RELEVAL_INTEL_NO_TURBO" ]; then
   set_intel_noturbo "$RELEVAL_INTEL_NO_TURBO"

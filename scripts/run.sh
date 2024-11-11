@@ -13,11 +13,13 @@ if [ $(uname -m) = "aarch64" ]; then
     )
 else
     EXPERIMENTS=(
-        # base           # A baseline run without Parallaft
+        base           # A baseline run without Parallaft
         parallaft      # A Parallaft run
-        # parallaft_raft # A RAFT run
+        parallaft_raft # A RAFT run
     )
 fi
+
+PARALLAFT_CHECKPIONT_PERIOD=
 
 ###########################
 
