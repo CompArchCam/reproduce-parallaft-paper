@@ -54,7 +54,6 @@ BENCHMARKS = [
     Benchmark("2006", "fp", "470.lbm", "lbm_base", ["e5f68a"]),
     Benchmark("2006", "fp", "481.wrf", "wrf_base", ["70336d"]),
     Benchmark("2006", "fp", "482.sphinx3", "sphinx_livepretend_base", ["3ab418"]),
-    Benchmark("2006", "fp", "specrand", "specrand_base", ["ecdcbc"]),
 ]
 
 T = TypeVar("T")
