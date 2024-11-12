@@ -27,3 +27,7 @@ set yrange [0:*]
 # Plot the data
 plot 'energy_overhead.dat' using 2:xtic(1) title 'Parallaft'  linecolor rgb "#44aaff", \
      '' using 3 title 'RAFT' linecolor rgb "red"
+
+set terminal pngcairo
+set output 'energy_overhead.png'
+replot

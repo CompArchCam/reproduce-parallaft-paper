@@ -487,7 +487,7 @@ def main():
         geomean = a.prod(axis=1) ** (1 / a.shape[1]) - 1.0
         out.append(
             [
-                "Geomean",
+                "geomean",
                 *geomean,
             ]
         )

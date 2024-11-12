@@ -6,6 +6,6 @@ all: $(PLOTS:%.gp=%.pdf)
 	gnuplot $<
 
 clean:
-	rm -rf *.pdf
+	rm -rf *.pdf *.png
 
 .PHONY: all clean
