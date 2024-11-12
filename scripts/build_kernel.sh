@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 BASE="$PWD"
 
 function check_cpu() {
-    local cpu_vendor=$(grep '^Vendor ID:' <<<"$lscpu_result" | awk '{print $NF}')
+    local cpu_vendor=$(lscpu | grep '^Vendor ID:' | awk '{print $NF}')
     if [ "$cpu_vendor" != "Apple" ]; then
         echo "Error: only Apple CPUs are supported"
         exit 1
@@ -15,7 +15,7 @@ function check_cpu() {
 
 check_cpu
 mkdir -p kernel
-pushed kernel
+pushd kernel
 
 git clone https://github.com/mbyzhang/linux-asahi.git --branch relsh --single-branch --depth=1
 cp "$BASE/support_files/asahi_kernel/config" linux-asahi/.config
