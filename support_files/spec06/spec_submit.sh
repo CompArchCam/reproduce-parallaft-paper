@@ -257,6 +257,7 @@ parallaft)
     export RUST_LOG=info
   fi
 
+  get_core_config
   parallaft_set_cpu_sets
   parallaft_set_checkpoint_period
   parallaft_enable_perf_counters
