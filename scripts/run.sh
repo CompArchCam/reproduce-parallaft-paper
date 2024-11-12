@@ -19,7 +19,7 @@ else
     )
 fi
 
-PARALLAFT_CHECKPIONT_PERIOD=
+PARALLAFT_CHECKPOINT_PERIOD=5000000000
 
 ###########################
 
@@ -57,38 +57,8 @@ function check_memory() {
     fi
 }
 
-function check_kernel() {
-    if [ $(uname -m) != "aarch64" ]; then
-        return
-    fi
-
-    # Check if the version ends with -parallaft
-    echo "Checking kernel version..."
-
-    local kern_ver=$(uname -r)
-    if [[ $kern_ver == *"-parallaft" ]]; then
-        echo "Kernel version is OK"
-    else
-        echo "Error: Kernel version is not correct, got $kern_ver, expecting one ending with -parallaft."
-        exit 1
-    fi
-
-    # Check if we can read hwmon sensors
-    echo "Checking power sensor..."
-
-    local hwmon=(/sys/bus/platform/devices/macsmc_hwmon/hwmon/hwmon*)
-    if [ -d $hwmon ]; then
-        cat "$hwmon"/power*_label | fgrep "CPU P-cores Power" >/dev/null
-        echo "Power sensor is OK"
-    else
-        echo "Error: macsmc_hwmon is not present"
-        exit 1
-    fi
-}
-
 setup_permissions
 check_memory
-check_kernel
 
 RELEVAL_DIR="$BASE/spec06/releval"
 REL_RUN="$RELEVAL_DIR/run.py"
@@ -99,5 +69,12 @@ echo "Raw results will be available under $RELEVAL_DIR/run"
 for experiment in "${EXPERIMENTS[@]}"; do
     echo "-----------------------------------"
     echo "Starting $experiment run..."
-    "$REL_RUN" --mode $experiment "${BENCHMARKS[@]}" --overwrite
+    REL_RUN_EXTRA_ARGS=()
+    if [ "$experiment" = "parallaft" -o "$experiment" = "parallaft_dyncpufreq" ]; then
+        REL_RUN_EXTRA_ARGS=(
+            --parallaft_core_alloc heterogeneous
+            --parallaft_checkpoint_period $PARALLAFT_CHECKPOINT_PERIOD
+        )
+    fi
+    "$REL_RUN" --mode $experiment "${REL_RUN_EXTRA_ARGS[@]}" "${BENCHMARKS[@]}" --overwrite
 done

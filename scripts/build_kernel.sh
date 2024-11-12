@@ -34,6 +34,7 @@ echo "Installing device tree blobs for kernel $KERN_RELEASE"
 DTB_DIR="/lib/firmware/$KERN_RELEASE/device-tree/apple"
 mkdir -p "$DTB_DIR"
 sudo cp -r arch/arm64/boot/dts/apple/*.dtb "$DTB_DIR"
+sudo update-m1n1
 
 # Install the kernel
 sudo make install
