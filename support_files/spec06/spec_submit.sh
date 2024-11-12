@@ -86,8 +86,6 @@ function parallaft_enable_hwmon() {
   fi
 }
 
-BIG_CORES_SET_1="2"
-
 function parallaft_set_cpu_sets() {
   local core_alloc="${RELEVAL_PARALLAFT_CORE_ALLOC:-all_big}"
 
@@ -97,6 +95,7 @@ function parallaft_set_cpu_sets() {
     local cpu_family=$(grep '^\s*CPU family:' <<<"$lscpu_result" | awk '{print $NF}')
     local cpu_model=$(grep '^\s*Model:' <<<"$lscpu_result" | awk '{print $NF}')
 
+    BIG_CORES_SET_1="2"
     BIG_CORES_SET_2="4,6,8,10"
     SMALL_CORES=""
 
@@ -243,6 +242,9 @@ sdt)
   ;;
 run)
   env >"$LOG_PREFIX.env.txt"
+
+  parallaft_set_cpu_sets
+
   /bin/time \
     -f $'timing.main_user_time=%U\ntiming.main_sys_time=%S\ntiming.main_wall_time=%e\ntiming.exit_status=%x\n' \
     -o "$RESULT_PREFIX.stats.txt" \
