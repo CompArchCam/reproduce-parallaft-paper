@@ -101,18 +101,10 @@ function get_core_config() {
       # On our Intel i7-12700 machine, CPU 16-19 are small cores
       SMALL_CORES="16,17,18,19"
       PARALLAFT_COMMON_ARGS+=(--max-nr-live-segments 5)
-
-      if [ "$core_alloc" = "heterogeneous" -o "$core_alloc" = "inverted_heterogeneous" ]; then
-        PARALLAFT_COMMON_ARGS+=(--enable-intel-hybrid-workaround true)
-      fi
     elif [ "$cpu_vendor" = "GenuineIntel" -a "$cpu_family" = "6" -a "$cpu_model" = "183" ]; then
       # On our Intel i7-14700 machine, CPU 16-27 are small cores
       SMALL_CORES="16,17,18,19,20,21,22,23,24,25,26,27"
       PARALLAFT_COMMON_ARGS+=(--max-nr-live-segments 13)
-
-      if [ "$core_alloc" = "heterogeneous" -o "$core_alloc" = "inverted_heterogeneous" ]; then
-        PARALLAFT_COMMON_ARGS+=(--enable-intel-hybrid-workaround true)
-      fi
     else
       PARALLAFT_COMMON_ARGS+=(--max-nr-live-segments 5)
     fi
@@ -126,6 +118,8 @@ function get_core_config() {
 }
 
 function parallaft_set_cpu_sets() {
+  local cpu_vendor=$(lscpu | grep '^Vendor ID:' | awk '{print $NF}')
+
   local core_alloc="${RELEVAL_PARALLAFT_CORE_ALLOC:-all_big}"
 
   case "$core_alloc" in
@@ -147,6 +141,10 @@ function parallaft_set_cpu_sets() {
     CHECKER_EMERG_CPU_SET="$BIG_CORES_SET_2"
     CHECKER_BOOSTER_CPU_SET="$BIG_CORES_SET_ALL"
     SHELL_CPU_SET="$SMALL_CORES"
+
+    if [ "$cpu_vendor" = "GenuineIntel" ]; then
+      PARALLAFT_COMMON_ARGS+=(--enable-intel-hybrid-workaround true)
+    fi
     ;;
   inverted-heterogeneous)
     # swap the role of big and small cores
@@ -154,6 +152,10 @@ function parallaft_set_cpu_sets() {
     MAIN_CPU_SET="$SMALL_CORES"
     CHECKER_CPU_SET="$BIG_CORES_SET_2"
     SHELL_CPU_SET="$BIG_CORES_SET_2"
+
+    if [ "$cpu_vendor" = "GenuineIntel" ]; then
+      PARALLAFT_COMMON_ARGS+=(--enable-intel-hybrid-workaround true)
+    fi
     ;;
   *)
     echo "Error: unsupported \$RELEVAL_PARALLAFT_CORE_ALLOC"
