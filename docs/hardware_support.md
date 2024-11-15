@@ -2,12 +2,13 @@
 
 ## Status matrix
 
-| Hardware                                     | Exec point R/R | Big/little configuration | CPU power reading |
-| -------------------------------------------- | -------------- | ------------------------ | ----------------- |
-| Apple M2 (non-Pro/Max/Ultra)                 | Y              | Y                        | Y                 |
-| Other Apple Silicon                          | Y              | N                        | N                 |
-| Intel Core i7-12700 or i7-14700              | Y              | Y                        | -                 |
-| Other 12th/13th/14th-gen heterogeneous Intel | Y              | N                        | -                 |
+| Hardware                                     | Exec point R/R | Big/little configuration | CPU power reading | Tested |
+| -------------------------------------------- | -------------- | ------------------------ | ----------------- | ------ |
+| Apple M2 (non-Pro/Max/Ultra)                 | Y              | Y                        | Y                 | Y      |
+| Apple M1 (non-Pro/Max/Ultra)                 | Y              | Y                        | Y                 | N      |
+| Other Apple Silicon                          | Y              | N                        | N                 | N      |
+| Intel Core i7-12700 or i7-14700              | Y              | Y                        | -                 | Y      |
+| Other 12th/13th/14th-gen heterogeneous Intel | Y              | N                        | -                 | N      |
 
 ## Enabling exec point R/R for a new processor
 
