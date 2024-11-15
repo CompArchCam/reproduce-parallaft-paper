@@ -19,7 +19,7 @@ else
     )
 fi
 
-PARALLAFT_CHECKPOINT_PERIOD=5000000000
+PARALLAFT_CHECKPOINT_PERIOD=5000000000 # 5b cycles on aarch64, or 5b instructions on x86_64
 
 ###########################
 
