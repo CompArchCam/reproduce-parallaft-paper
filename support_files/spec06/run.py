@@ -538,7 +538,7 @@ def main():
         exp_name = metadata.get_experiment_name()
 
     try:
-        with FileLock(args.releval_dir / LOCK_FILENAME, blocking=False):
+        with FileLock(args.releval_dir / LOCK_FILENAME, timeout=0):
             run_experiment_repeated(
                 exp_name,
                 args.benchmarks,
