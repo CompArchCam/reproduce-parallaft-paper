@@ -41,7 +41,7 @@ $ ./scripts/build_app.sh
 To install SPEC CPU 2006, first obtain a copy of SPEC CPU 2006 ISO and place `cpu2006-1.2.iso` at the root of the artefact package. Then execute:
 
 ```sh
-$ ./install_spec06.sh
+$ ./scripts/install_spec06.sh
 ```
 
 ### Additional steps for Apple Silicon aarch64
@@ -49,9 +49,9 @@ $ ./install_spec06.sh
 On Apple Silicon aarch64, we need a patched Linux kernel to access power sensor readings (for measuring energy consumption in our experiments) and for Parallaft to monitor dirty pages. To do that, run
 
 ```sh
-$ ./build_kernel.sh
+$ ./scripts/build_kernel.sh
 $ sudo reboot
-$ ./check_kernel.sh
+$ ./scripts/check_kernel.sh
 ```
 
 If everything is okay, you should see the following.
@@ -65,24 +65,59 @@ Power sensor is OK
 
 Our patch only supports reading power sensors from Apple M1 and M2 processors (non-Pro/Max/Ultra models). If you are not using one of these, check `docs/hardware_support.md` for guide to add support for your processor.
 
-## Running experiments
+## Workflow
 
-## Run all experiments and plot results
+### Running all experiments
+
+In our experiments, the following runs are performed on all SPEC CPU 2006 int and fp benchmarks.
+
+* A baseline run, to get execution time and CPU time without Parallaft or RAFT.
+* (aarch64 only) A baseline energy-consumption profiling run, to get baseline energy consumption without Parallaft or RAFT.
+* A Parallaft run.
+* A RAFT run.
+
+To run all experiments, run:
 
 ```sh
-$ ./run.sh
-$ ./plot.sh
+$ ./scripts/run.sh
 ```
 
-Plots will be available under `plots` directory. We do not plot energy overhead on x86_64 processors due to their lack of separate voltage domains for big and little cores (hence giving little energy savings).
+Raw results (`*.stats.txt`) will be available under `spec06/releval/run/*/result`.
+
+### Plotting results
+
+Our experiments reproduce the following plots.
+
+* Performance overhead of Parallaft and RAFT (Figure 5).
+* Performance-overhead breakdown of Parallaft (Figure 6).
+* Energy overhead of Parallaft and RAFT (Figure 7). This result will only be available on Apple Silicon aarch64 platforms.
+
+To plot them, run:
+
+```sh
+$ ./scripts/plot.sh
+```
+
+Plots will be available under `plots` directory. On an Apple M2, they should look broadly similar to the figures in our paper.
 
 ### Customization
 
 - **Running a subset of benchmarks or experiments**: Modify `BENCHMARKS` and `EXPERIMENTS` in `scripts/run.sh`.
 - **Tuning parameters**: Adjust `PARALLAFT_CHECKPOINT_PERIOD` in `scripts/run.sh`.
 
-## Running an arbitrary program under Parallaft
+### Running an arbitrary program under Parallaft
 
 ```sh
 $ ./bin/parallaft --config ./app/parallaft/configs/apple_m2_fixed_interval.yml -- path/to/your/program arg1 arg2
 ```
+
+When the execution finishes, Parallaft dumps some statistics. The key ones are:
+
+- `timing.all_wall_time`: Wall time elapsed to finish the program execution, including the waiting time for outstanding checkers to finish after the main finishes.
+- `timing.main_wall_time`: Wall time elapsed to finish the main program execution, excluding the waiting time for checkers.
+- `timing.main_{user,sys}_time`: User/system time used by the main program execution.
+- `hwmon.macsmc_hwmon/*`: *(Apple Silicon only)* Energy used for different components of the SoC during the program execution.
+- `counter.checkpoint_count`: Number of checkpoints taken, including checkpoints taken to handle certain `mmap` syscalls and to slice the program execution for checker parallelism.
+- `fixed_interval_slicer.nr_slices`: Number of checkpoints taken to slice the program execution after reaching a specified checkpoint period.
+
+Use another config to run on a Intel processor, e.g. for Intel Core i7-12700, use \texttt{intel\_12700\_fixed\_interval.yml}.
