@@ -120,4 +120,4 @@ When the execution finishes, Parallaft dumps some statistics. The key ones are:
 - `counter.checkpoint_count`: Number of checkpoints taken, including checkpoints taken to handle certain `mmap` syscalls and to slice the program execution for checker parallelism.
 - `fixed_interval_slicer.nr_slices`: Number of checkpoints taken to slice the program execution after reaching a specified checkpoint period.
 
-Use another config to run on a Intel processor, e.g. for Intel Core i7-12700, use \texttt{intel\_12700\_fixed\_interval.yml}.
+Use another config to run on a Intel processor, e.g. for Intel Core i7-12700, use `intel_12700_fixed_interval.yml`.
