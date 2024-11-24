@@ -121,3 +121,16 @@ When the execution finishes, Parallaft dumps some statistics. The key ones are:
 - `fixed_interval_slicer.nr_slices`: Number of checkpoints taken to slice the program execution after reaching a specified checkpoint period.
 
 Use another config to run on a Intel processor, e.g. for Intel Core i7-12700, use `intel_12700_fixed_interval.yml`.
+
+## Uninstalling
+
+### Uninstalling the custom Apple Silicon aarch64 kernel
+
+```sh
+$ sudo -i
+$ rm /boot/*-6.10.5-asahi-parallaft
+$ rm -r /lib/firmware/6.10.5-asahi-parallaft
+$ update-grub
+$ update-m1n1
+```
+
