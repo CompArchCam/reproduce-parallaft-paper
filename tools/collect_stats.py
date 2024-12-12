@@ -497,7 +497,7 @@ def main():
     if not args.no_header:
         out_buf += args.sep.join(
             ["name"] + list(map(lambda f: f[0].value + ":" + f[1].name, fields))
-        )
+        ) + "\n"
 
     for line in out:
         if args.no_names:
